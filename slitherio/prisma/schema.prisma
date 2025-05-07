@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or "mysql" or "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id        Int      @id 
+  username  String   @unique
+  score     Int      @default(0)
+  snake     Snake?
+  createdAt DateTime @default(now())
+
+  PlayerInGame PlayerInGame[]
+}
+
+model Game {
+  id        Int      @id 
+  name      String
+  status    GameStatus @default(WAITING)
+  players   PlayerInGame[]
+  foods     Food[]
+  startedAt DateTime?
+  endedAt   DateTime?
+  createdAt DateTime @default(now())
+}
+
+model PlayerInGame {
+  id        Int     @id 
+  player    Player  @relation(fields: [playerId], references: [id])
+  playerId  Int
+  game      Game    @relation(fields: [gameId], references: [id])
+  gameId    Int
+  isAlive   Boolean @default(true)
+  score     Int     @default(0)
+}
+
+model Snake {
+  id        Int       @id 
+  player    Player    @relation(fields: [playerId], references: [id])
+  playerId  Int       @unique
+  segments  SnakeSegment[]
+  length    Int       @default(1)
+  lastMoved DateTime  @default(now())
+}
+
+model SnakeSegment {
+  id        Int      @id 
+  snake     Snake    @relation(fields: [snakeId], references: [id])
+  snakeId   Int
+  x         Float
+  y         Float
+  order     Int      // Head is order 0
+}
+
+model Food {
+  id      Int    @id 
+  game    Game   @relation(fields: [gameId], references: [id])
+  gameId  Int
+  x       Float
+  y       Float
+  size    Float  @default(1.0)
+}
+
+enum GameStatus {
+  WAITING
+  ACTIVE
+  FINISHED
+}

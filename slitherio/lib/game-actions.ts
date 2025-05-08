@@ -7,10 +7,10 @@ import type { Direction } from "@/hooks/use-game-controls"
 
 // Create a Map to store player directions that persists between requests
 // Note: In a production app, you'd use Redis or another persistent store
-const playerDirections = new Map<number, Direction>()
+const playerDirections = new Map<string, Direction>()
 
 // Create a Map to store player colors
-const playerColors = new Map<number, string>()
+const playerColors = new Map<string, string>()
 
 // Create a new game or join existing one with the same name
 export async function createGame(username: string, gameName: string, snakeColor = "#22c55e") {
@@ -102,7 +102,7 @@ export async function createGame(username: string, gameName: string, snakeColor 
 }
 
 // Join an existing game
-export async function joinGame(username: string, gameId: number, snakeColor = "#22c55e") {
+export async function joinGame(username: string, gameId: string, snakeColor = "#22c55e") {
   // Create or find player
   const player = await db.player.upsert({
     where: { username },
@@ -219,12 +219,12 @@ export async function joinGame(username: string, gameId: number, snakeColor = "#
 }
 
 // Get player color
-export function getPlayerColor(playerId: number): string {
-  return playerColors.get(playerId) || "#22c55e" // Default to green if no color is set
+export async function getPlayerColor(playerId: string) {
+  return playerColors.get(playerId) || "#22c55e"
 }
 
 // Start the game
-export async function startGame(gameId: number) {
+export async function startGame(gameId: string) {
   // First check if the game exists and is in WAITING status
   const existingGame = await db.game.findUnique({
     where: { id: gameId },
@@ -242,7 +242,7 @@ export async function startGame(gameId: number) {
   // Get the player ID from cookie
   const cookieStore = await cookies()
   const playerIdStr = cookieStore.get("playerId")?.value
-  const playerId = playerIdStr ? Number.parseInt(playerIdStr) : null
+  const playerId = playerIdStr
 
   if (!playerId) {
     throw new Error("Player not found")
@@ -310,11 +310,11 @@ export async function startGame(gameId: number) {
 }
 
 // Get current game state
-export async function getGameState(gameId: number) {
+export async function getGameState(gameId: string) {
   // Get player ID from cookie - properly await cookies
   const cookieStore = await cookies()
   const playerIdStr = cookieStore.get("playerId")?.value
-  const playerId = playerIdStr ? Number.parseInt(playerIdStr) : null
+  const playerId = playerIdStr
 
   // Get game with players, foods, and snakes
   const game = await db.game.findUnique({
@@ -397,7 +397,7 @@ export async function getGameState(gameId: number) {
 export async function updateDirection(direction: Direction) {
   const cookieStore = await cookies()
   const playerIdStr = cookieStore.get("playerId")?.value
-  const playerId = playerIdStr ? Number.parseInt(playerIdStr) : null
+  const playerId = playerIdStr
 
   if (!playerId) {
     throw new Error("Player not found")
@@ -412,11 +412,11 @@ export async function updateDirection(direction: Direction) {
 }
 
 // Move snake
-export async function moveSnake(gameId: number) {
+export async function moveSnake(gameId: string) {
   // Get player ID from cookie
   const cookieStore = await cookies()
   const playerIdStr = cookieStore.get("playerId")?.value
-  const playerId = playerIdStr ? Number.parseInt(playerIdStr) : null
+  const playerId = playerIdStr
 
   if (!playerId) {
     throw new Error("Player not found")
@@ -543,7 +543,7 @@ export async function moveSnake(gameId: number) {
 }
 
 // Handle snake growth when eating food
-async function handleSnakeGrowth(snakeId: number, playerId: number, foodId: number, gameId: number) {
+async function handleSnakeGrowth(snakeId: string, playerId: string, foodId: string, gameId: string) {
   // Get the snake with segments
   const snake = await db.snake.findUnique({
     where: {
@@ -634,7 +634,7 @@ async function handleSnakeGrowth(snakeId: number, playerId: number, foodId: numb
 }
 
 // Check for collisions with other snakes or boundaries
-async function checkCollisions(gameId: number, playerId: number, headX: number, headY: number) {
+async function checkCollisions(gameId: string, playerId: string, headX: number, headY: number) {
   // Check boundary collision
   if (headX <= 0 || headX >= 1 || headY <= 0 || headY >= 1) {
     await handlePlayerDeath(gameId, playerId)
@@ -702,7 +702,7 @@ async function checkCollisions(gameId: number, playerId: number, headX: number, 
 }
 
 // Handle player death
-async function handlePlayerDeath(gameId: number, playerId: number) {
+async function handlePlayerDeath(gameId: string, playerId: string) {
   // Mark player as not alive
   await db.playerInGame.updateMany({
     where: {

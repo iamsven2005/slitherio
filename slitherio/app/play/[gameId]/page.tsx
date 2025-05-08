@@ -9,7 +9,6 @@ import DebugPanel from "@/components/debug-panel"
 export default async function GamePage({ params }: { params: { gameId: string } }) {
   // Properly handle params as they need to be awaited in Next.js
   const gameIdParam = await Promise.resolve(params.gameId)
-  const gameId = gameIdParam === "new" ? null : Number.parseInt(gameIdParam)
 
   // For new game, we'll create it when the player submits their username
   if (gameIdParam === "new") {
@@ -22,7 +21,7 @@ export default async function GamePage({ params }: { params: { gameId: string } 
 
   // For existing game, fetch it
   const game = await db.game.findUnique({
-    where: { id: gameId },
+    where: { id: gameIdParam },
     include: {
       players: {
         include: {

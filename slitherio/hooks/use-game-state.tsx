@@ -4,23 +4,23 @@ import { useState, useEffect } from "react"
 import { getGameState, moveSnake } from "@/lib/game-actions"
 
 export interface GameState {
-  id: number
+  id: string
   name: string
   status: string
   playerCount: number
   foods: {
-    id: number
+    id: string
     x: number
     y: number
     size: number
   }[]
   snakes: {
-    id: number
-    playerId: number
+    id: string
+    playerId: string
     color: string
     length: number
     segments: {
-      id: number
+      id: string
       x: number
       y: number
       order: number
@@ -29,14 +29,14 @@ export interface GameState {
 }
 
 export interface PlayerState {
-  playerId: number
+  playerId: string
   username: string
   score: number
   isAlive: boolean
   color: string
 }
 
-export function useGameState(gameId: number) {
+export function useGameState(gameId: string) {
   const [gameState, setGameState] = useState<GameState | null>(null)
   const [playerState, setPlayerState] = useState<PlayerState | null>(null)
   const [error, setError] = useState<string | null>(null)

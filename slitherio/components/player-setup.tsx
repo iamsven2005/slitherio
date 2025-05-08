@@ -12,7 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 
 interface PlayerSetupProps {
-  gameId?: number
+  gameId?: string
   isNewGame: boolean
 }
 

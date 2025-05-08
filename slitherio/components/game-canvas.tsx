@@ -6,7 +6,7 @@ import { useGameControls } from "@/hooks/use-game-controls"
 import GameOver from "./game-over"
 
 interface GameCanvasProps {
-  gameId: number
+  gameId: string
 }
 
 export default function GameCanvas({ gameId }: GameCanvasProps) {
@@ -82,11 +82,13 @@ export default function GameCanvas({ gameId }: GameCanvasProps) {
     // Draw snakes
     gameState.snakes.forEach((snake) => {
       const isCurrentPlayer = snake.playerId === playerState?.playerId
-      const snakeColor = snake.color || (isCurrentPlayer ? "#22c55e" : "#ef4444")
-      const snakeHeadColor = isCurrentPlayer
-        ? adjustColor(snakeColor, 20) // Brighter for head
-        : adjustColor(snakeColor, 20)
-
+      function isHexColor(str: unknown): str is string {
+        return typeof str === "string" && /^#[0-9A-Fa-f]{6}$/.test(str)
+      }
+      
+      const defaultColor = isCurrentPlayer ? "#22c55e" : "#ef4444"
+      const snakeColor = isHexColor(snake.color) ? snake.color : defaultColor
+      const snakeHeadColor = adjustColor(snakeColor, 20)
       // Sort segments by order (head first)
       const sortedSegments = [...snake.segments].sort((a, b) => a.order - b.order)
 

@@ -13,7 +13,6 @@ export default async function Home() {
       createdAt: "desc",
     },
   })
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-b from-green-50 to-green-100">
       <div className="max-w-3xl w-full space-y-8">

@@ -5,8 +5,8 @@ import { useGameControls } from "@/hooks/use-game-controls"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface DebugPanelProps {
-  gameId: number
-  playerId?: number
+  gameId: string
+  playerId?: string
 }
 
 export default function DebugPanel({ gameId, playerId }: DebugPanelProps) {

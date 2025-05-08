@@ -10,7 +10,7 @@ import { joinGame } from "@/lib/game-actions"
 interface GameOverProps {
   score: number
   username: string
-  gameId: number
+  gameId: string
 }
 
 export default function GameOver({ score, username, gameId }: GameOverProps) {

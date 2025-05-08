@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { updateDirection } from "@/lib/game-actions"
 
 export type Direction = "up" | "down" | "left" | "right"
 
@@ -25,7 +24,27 @@ export function useGameControls() {
     directionRef.current = newDirection
 
     // Send direction update to server immediately
-    updateDirection(newDirection).catch(console.error)
+    const gameId = window.location.pathname.split("/").pop()
+    console.log(`Sending direction update to game ${gameId}: ${newDirection}`)
+
+    fetch(`/api/game/${gameId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "direction",
+        direction: newDirection,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.error(`Direction update failed: ${response.statusText}`)
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating direction:", error)
+      })
   }, [])
 
   // Handle keyboard controls

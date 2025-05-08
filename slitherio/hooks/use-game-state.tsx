@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { getGameState, moveSnake } from "@/lib/game-actions"
 
 export interface GameState {
   id: string
@@ -47,11 +46,19 @@ export function useGameState(gameId: string) {
 
     const fetchGameState = async () => {
       try {
-        const { game, player } = await getGameState(gameId)
+        const response = await fetch(`/api/game/${gameId}`)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch game state: ${response.statusText}`)
+        }
+
+        const data = await response.json()
 
         if (isMounted) {
-          setGameState(game)
-          setPlayerState(player)
+          setGameState(data.game)
+          // Check if player data is included in the response
+          if (data.player) {
+            setPlayerState(data.player)
+          }
           setError(null)
         }
       } catch (err) {
@@ -81,7 +88,19 @@ export function useGameState(gameId: string) {
     if (playerState?.isAlive) {
       moveIntervalId = setInterval(async () => {
         try {
-          await moveSnake(gameId)
+          const response = await fetch(`/api/game/${gameId}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              action: "move",
+            }),
+          })
+
+          if (!response.ok) {
+            console.error(`Move request failed: ${response.statusText}`)
+          }
         } catch (err) {
           console.error("Error moving snake:", err)
         }

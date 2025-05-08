@@ -29,19 +29,19 @@ export default function SocketHandler(req: NextApiRequest, res: NextApiResponseW
       console.log("Client connected:", socket.id)
 
       // Join a game room
-      socket.on("join-game", (gameId: number) => {
+      socket.on("join-game", (gameId: string) => {
         socket.join(`game-${gameId}`)
         console.log(`Client ${socket.id} joined game ${gameId}`)
       })
 
       // Leave a game room
-      socket.on("leave-game", (gameId: number) => {
+      socket.on("leave-game", (gameId: string) => {
         socket.leave(`game-${gameId}`)
         console.log(`Client ${socket.id} left game ${gameId}`)
       })
 
       // Handle snake movement
-      socket.on("move-snake", async (data: { gameId: number; playerId: number; direction: string }) => {
+      socket.on("move-snake", async (data: { gameId: string; playerId: string; direction: string }) => {
         try {
           const { gameId, playerId, direction } = data
 
@@ -155,7 +155,7 @@ export default function SocketHandler(req: NextApiRequest, res: NextApiResponseW
 }
 
 // Handle food collision (snake growth)
-async function handleFoodCollision(gameId: number, playerId: number, foodId: number) {
+async function handleFoodCollision(gameId: string, playerId: string, foodId: string) {
   try {
     // Get the player's snake
     const snake = await db.snake.findUnique({
@@ -275,7 +275,7 @@ async function handleFoodCollision(gameId: number, playerId: number, foodId: num
 }
 
 // Check for collisions with other snakes
-async function checkSnakeCollisions(gameId: number, playerId: number, headX: number, headY: number) {
+async function checkSnakeCollisions(gameId: string, playerId: string, headX: number, headY: number) {
   try {
     // Get all snakes in the game except the current player's
     const otherSnakes = await db.snake.findMany({
@@ -357,7 +357,7 @@ async function checkSnakeCollisions(gameId: number, playerId: number, headX: num
 }
 
 // Handle snake death
-async function handleSnakeDeath(gameId: number, playerId: number, playerInGameId: number) {
+async function handleSnakeDeath(gameId: string, playerId: string, playerInGameId: string) {
   try {
     // Mark player as not alive
     await db.playerInGame.update({
